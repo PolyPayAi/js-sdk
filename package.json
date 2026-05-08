@@ -1,0 +1,55 @@
+{
+  "name": "@ponponpay/sdk",
+  "version": "1.1.0",
+  "description": "Official PonponPay JavaScript SDK for browser integrations using Public Key mode.",
+  "license": "MIT",
+  "homepage": "https://ponponpay.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/useponponpay/js-sdk.git"
+  },
+  "keywords": [
+    "ponponpay",
+    "crypto",
+    "payment",
+    "public-key",
+    "browser-sdk",
+    "usdt",
+    "usdc"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./browser": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./x402": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsup": "^8.2.4",
+    "typescript": "^5.6.3"
+  }
+}
