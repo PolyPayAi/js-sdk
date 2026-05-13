@@ -18,13 +18,19 @@ export function normalizeBaseUrl(baseUrl: string): string {
 
 export function normalizeX402Url(baseUrl: string): string {
   const trimmed = trimTrailingSlash(baseUrl);
+  if (trimmed.endsWith('/api/v1/pay/x402')) {
+    return trimmed;
+  }
+  if (trimmed.endsWith('/api/v1/pay')) {
+    return `${trimmed}/x402`;
+  }
   if (trimmed.endsWith('/api/v1/x402')) {
     return trimmed;
   }
   if (trimmed.endsWith('/api/v1')) {
-    return `${trimmed}/x402`;
+    return `${trimmed}/pay/x402`;
   }
-  return `${trimmed}/api/v1/x402`;
+  return `${trimmed}/api/v1/pay/x402`;
 }
 
 export function sleep(ms: number): Promise<void> {
