@@ -1,7 +1,7 @@
-export { PonponPayClient } from './client';
-export { PonponPayCheckout } from './checkout';
-export { PonponPayError } from './errors';
-export { PonponPayX402, ponponpayX402 } from './x402';
+export { PolyPayClient } from './client';
+export { PolyPayCheckout } from './checkout';
+export { PolyPayError } from './errors';
+export { PolyPayX402, polypayX402 } from './x402';
 export type {
   CheckoutStatusEventMap,
   CreateOrderParams,
@@ -12,7 +12,7 @@ export type {
   OrderStatus,
   OrderStatusResponse,
   PollStatusOptions,
-  PonponPayClientOptions,
+  PolyPayClientOptions,
   SessionTokenPayload,
   X402GuardOptions,
   X402GuardResult,

@@ -1,9 +1,9 @@
-import { PonponPayError } from './errors';
+import { PolyPayError } from './errors';
 import {
   CreateOrderParams,
   CreateOrderResponse,
   OrderStatusResponse,
-  PonponPayClientOptions,
+  PolyPayClientOptions,
   SessionTokenPayload
 } from './types';
 import {
@@ -18,7 +18,7 @@ interface CachedToken {
   expiresAt: number;
 }
 
-export class PonponPayClient {
+export class PolyPayClient {
   private readonly publicKey: string;
   private readonly baseUrl: string;
   private readonly tokenPath: string;
@@ -30,13 +30,13 @@ export class PonponPayClient {
   private tokenCache: CachedToken | null = null;
   private inflightTokenPromise: Promise<CachedToken> | null = null;
 
-  constructor(options: PonponPayClientOptions) {
+  constructor(options: PolyPayClientOptions) {
     if (!options.publicKey?.trim()) {
-      throw new PonponPayError('publicKey is required.');
+      throw new PolyPayError('publicKey is required.');
     }
 
     this.publicKey = options.publicKey.trim();
-    this.baseUrl = normalizeBaseUrl(options.baseUrl ?? 'https://api.ponponpay.com');
+    this.baseUrl = normalizeBaseUrl(options.baseUrl ?? 'https://api.polypay.ai');
     this.tokenPath = options.tokenPath ?? '/token';
     this.ordersPath = options.ordersPath ?? '/orders';
     this.timeout = options.timeout ?? 30000;
@@ -55,13 +55,13 @@ export class PonponPayClient {
 
   async createOrder(params: CreateOrderParams): Promise<CreateOrderResponse> {
     if (!params.currency) {
-      throw new PonponPayError('currency is required.');
+      throw new PolyPayError('currency is required.');
     }
     if (!params.network) {
-      throw new PonponPayError('network is required.');
+      throw new PolyPayError('network is required.');
     }
     if (!Number.isFinite(params.amount) || params.amount <= 0) {
-      throw new PonponPayError('amount must be a positive number.');
+      throw new PolyPayError('amount must be a positive number.');
     }
 
     const token = await this.ensureSessionToken();
@@ -90,7 +90,7 @@ export class PonponPayClient {
 
   async getOrderStatus(tradeId: string): Promise<OrderStatusResponse> {
     if (!tradeId?.trim()) {
-      throw new PonponPayError('tradeId is required.');
+      throw new PolyPayError('tradeId is required.');
     }
 
     const token = await this.ensureSessionToken();
@@ -137,7 +137,7 @@ export class PonponPayClient {
     });
 
     if (!data.token) {
-      throw new PonponPayError('PonponPay token response is missing token.');
+      throw new PolyPayError('PolyPay token response is missing token.');
     }
 
     return {
@@ -176,7 +176,7 @@ export class PonponPayClient {
       return this.normalizeKeys(data) as T;
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
-        throw new PonponPayError('PonponPay request timed out.');
+        throw new PolyPayError('PolyPay request timed out.');
       }
       throw error;
     } finally {

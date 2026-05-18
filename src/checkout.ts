@@ -1,25 +1,25 @@
-import { PonponPayError } from './errors';
+import { PolyPayError } from './errors';
 import { CheckoutStatusEventMap, ModalOptions, OrderStatusResponse, PollStatusOptions } from './types';
 import { assertBrowser, sleep } from './utils';
-import { PonponPayClient } from './client';
+import { PolyPayClient } from './client';
 
 type EventName = keyof CheckoutStatusEventMap;
 type EventHandler<T extends EventName> = (payload: CheckoutStatusEventMap[T]) => void;
 
-export class PonponPayCheckout {
-  private readonly client?: PonponPayClient;
+export class PolyPayCheckout {
+  private readonly client?: PolyPayClient;
   private popupWindow: Window | null = null;
   private pollAbortController: AbortController | null = null;
   private readonly handlers: Map<EventName, Set<(payload: unknown) => void>> = new Map();
 
-  constructor(client?: PonponPayClient) {
+  constructor(client?: PolyPayClient) {
     this.client = client;
   }
 
   redirect(paymentUrl: string): void {
     assertBrowser();
     if (!paymentUrl) {
-      throw new PonponPayError('paymentUrl is required.');
+      throw new PolyPayError('paymentUrl is required.');
     }
     window.location.href = paymentUrl;
   }
@@ -27,7 +27,7 @@ export class PonponPayCheckout {
   openModal(paymentUrl: string, options: ModalOptions = {}): Window | null {
     assertBrowser();
     if (!paymentUrl) {
-      throw new PonponPayError('paymentUrl is required.');
+      throw new PolyPayError('paymentUrl is required.');
     }
 
     const width = options.width ?? '450px';
@@ -39,7 +39,7 @@ export class PonponPayCheckout {
 
     this.popupWindow = window.open(
       paymentUrl,
-      'ponponpay_checkout',
+      'polypay_checkout',
       `popup=yes,width=${parsedWidth},height=${parsedHeight},left=${left},top=${top}`
     );
 
@@ -58,7 +58,7 @@ export class PonponPayCheckout {
 
   async pollStatus(tradeId: string, options: PollStatusOptions = {}): Promise<OrderStatusResponse> {
     if (!this.client) {
-      throw new PonponPayError('PonponPayCheckout requires a PonponPayClient instance for pollStatus().');
+      throw new PolyPayError('PolyPayCheckout requires a PolyPayClient instance for pollStatus().');
     }
 
     this.stopPolling();
@@ -82,7 +82,7 @@ export class PonponPayCheckout {
 
       if (Date.now() - startedAt >= timeout) {
         this.stopPolling();
-        const error = new PonponPayError('Payment status polling timed out.');
+        const error = new PolyPayError('Payment status polling timed out.');
         this.emit('error', error);
         throw error;
       }
@@ -90,7 +90,7 @@ export class PonponPayCheckout {
       await sleep(interval);
     }
 
-    const error = new PonponPayError('Payment status polling was aborted.');
+    const error = new PolyPayError('Payment status polling was aborted.');
     this.emit('error', error);
     throw error;
   }

@@ -14,10 +14,10 @@ export default defineConfig([
   },
   {
     entry: {
-      'ponponpay.min': 'src/global.ts'
+      'polypay.min': 'src/global.ts'
     },
     format: ['iife'],
-    globalName: 'PonponPay',
+    globalName: 'PolyPay',
     sourcemap: true,
     minify: true,
     clean: false,

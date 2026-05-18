@@ -1,30 +1,30 @@
-import { PonponPayCheckout } from './checkout';
-import { PonponPayClient } from './client';
-import { PonponPayError } from './errors';
-import { PonponPayX402, ponponpayX402 } from './x402';
+import { PolyPayCheckout } from './checkout';
+import { PolyPayClient } from './client';
+import { PolyPayError } from './errors';
+import { PolyPayX402, polypayX402 } from './x402';
 
 const api = {
-  PonponPayClient,
-  PonponPayCheckout,
-  PonponPayError,
-  PonponPayX402,
-  ponponpayX402
+  PolyPayClient,
+  PolyPayCheckout,
+  PolyPayError,
+  PolyPayX402,
+  polypayX402
 };
 
 declare global {
   interface Window {
-    PonponPay?: typeof api;
-    PonponPayClient?: typeof PonponPayClient;
-    PonponPayCheckout?: typeof PonponPayCheckout;
-    PonponPayX402?: typeof PonponPayX402;
+    PolyPay?: typeof api;
+    PolyPayClient?: typeof PolyPayClient;
+    PolyPayCheckout?: typeof PolyPayCheckout;
+    PolyPayX402?: typeof PolyPayX402;
   }
 }
 
 if (typeof window !== 'undefined') {
-  window.PonponPay = api;
-  window.PonponPayClient = PonponPayClient;
-  window.PonponPayCheckout = PonponPayCheckout;
-  window.PonponPayX402 = PonponPayX402;
+  window.PolyPay = api;
+  window.PolyPayClient = PolyPayClient;
+  window.PolyPayCheckout = PolyPayCheckout;
+  window.PolyPayX402 = PolyPayX402;
 }
 
 export default api;

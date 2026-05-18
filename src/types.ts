@@ -4,7 +4,7 @@ export type Network = 'tron' | 'ethereum' | 'bsc' | 'solana' | 'polygon' | (stri
 
 export type OrderStatus = 'pending' | 'paid' | 'expired' | 'cancelled' | 'unknown';
 
-export interface PonponPayClientOptions {
+export interface PolyPayClientOptions {
   publicKey: string;
   baseUrl?: string;
   tokenPath?: string;

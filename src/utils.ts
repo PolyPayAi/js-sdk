@@ -1,5 +1,5 @@
 import { ApiEnvelope } from './types';
-import { PonponPayError } from './errors';
+import { PolyPayError } from './errors';
 
 export function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '');
@@ -41,7 +41,7 @@ export function sleep(ms: number): Promise<void> {
 
 export function assertBrowser(): void {
   if (typeof window === 'undefined') {
-    throw new PonponPayError('PonponPay browser SDK must run in a browser environment.');
+    throw new PolyPayError('PolyPay browser SDK must run in a browser environment.');
   }
 }
 
@@ -51,13 +51,13 @@ export async function parseApiResponse<T>(response: Response): Promise<T> {
   try {
     body = (await response.json()) as ApiEnvelope<T>;
   } catch {
-    throw new PonponPayError('Invalid JSON response from PonponPay.', {
+    throw new PolyPayError('Invalid JSON response from PolyPay.', {
       status: response.status
     });
   }
 
   if (!response.ok) {
-    throw new PonponPayError(body.message || `HTTP ${response.status}`, {
+    throw new PolyPayError(body.message || `HTTP ${response.status}`, {
       code: body.code,
       status: response.status,
       payload: body
@@ -65,7 +65,7 @@ export async function parseApiResponse<T>(response: Response): Promise<T> {
   }
 
   if (!body || body.code !== 0) {
-    throw new PonponPayError(body?.message || 'PonponPay request failed.', {
+    throw new PolyPayError(body?.message || 'PolyPay request failed.', {
       code: body?.code,
       status: response.status,
       payload: body

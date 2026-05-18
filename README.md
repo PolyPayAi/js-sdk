@@ -1,6 +1,6 @@
-# PonponPay JavaScript SDK
+# PolyPay JavaScript SDK
 
-Official SDK for PonponPay browser checkout integrations and server-side x402 agent payments.
+Official SDK for PolyPay browser checkout integrations and server-side x402 agent payments.
 
 The browser client is designed for frontend applications that need to:
 
@@ -13,7 +13,7 @@ The x402 helper is designed for server-side route handlers that need to:
 
 - return HTTP 402 payment requirements for protected resources
 - verify `X-PAYMENT` payloads
-- settle standard EVM USDC `exact` payments through PonponPay
+- settle standard EVM USDC `exact` payments through PolyPay
 
 ## Features
 
@@ -27,21 +27,21 @@ The x402 helper is designed for server-side route handlers that need to:
 ## Installation
 
 ```bash
-npm install @ponponpay/sdk
+npm install @polypay/sdk
 ```
 
 ```bash
-pnpm add @ponponpay/sdk
+pnpm add @polypay/sdk
 ```
 
 ## Quick Start
 
 ```ts
-import { PonponPayClient } from '@ponponpay/sdk/browser';
+import { PolyPayClient } from '@polypay/sdk/browser';
 
-const client = new PonponPayClient({
+const client = new PolyPayClient({
   publicKey: 'pub_your_public_key',
-  baseUrl: 'https://api.ponponpay.com'
+  baseUrl: 'https://api.polypay.ai'
 });
 
 const order = await client.createOrder({
@@ -61,28 +61,28 @@ window.location.href = order.paymentUrl;
 Pass the server origin as `baseUrl`:
 
 ```ts
-const client = new PonponPayClient({
+const client = new PolyPayClient({
   publicKey: 'pub_your_public_key',
-  baseUrl: 'https://api.ponponpay.com'
+  baseUrl: 'https://api.polypay.ai'
 });
 ```
 
 The SDK automatically expands it to:
 
 ```text
-https://api.ponponpay.com/api/v1/sdk
+https://api.polypay.ai/api/v1/sdk
 ```
 
 If you already pass a URL ending in `/api/v1` or `/api/v1/sdk`, it will preserve the correct path.
 
 ## API
 
-### `new PonponPayClient(options)`
+### `new PolyPayClient(options)`
 
 Options:
 
 - `publicKey: string` Required merchant public key in `pub_xxx` format
-- `baseUrl?: string` PonponPay API origin, default `https://api.ponponpay.com`
+- `baseUrl?: string` PolyPay API origin, default `https://api.polypay.ai`
 - `timeout?: number` Request timeout in milliseconds, default `30000`
 - `autoRefreshWindowSeconds?: number` Refresh token before expiry, default `60`
 - `headers?: Record<string, string>` Extra request headers
@@ -140,16 +140,16 @@ Response fields:
 ### Redirect
 
 ```ts
-import { PonponPayCheckout } from '@ponponpay/sdk/browser';
+import { PolyPayCheckout } from '@polypay/sdk/browser';
 
-const checkout = new PonponPayCheckout();
+const checkout = new PolyPayCheckout();
 checkout.redirect(order.paymentUrl);
 ```
 
 ### Popup modal
 
 ```ts
-const checkout = new PonponPayCheckout();
+const checkout = new PolyPayCheckout();
 
 checkout.openModal(order.paymentUrl, {
   width: '450px',
@@ -163,7 +163,7 @@ checkout.openModal(order.paymentUrl, {
 ### Poll payment status
 
 ```ts
-const checkout = new PonponPayCheckout(client);
+const checkout = new PolyPayCheckout(client);
 
 checkout.on('paid', (data) => {
   console.log('paid', data.tradeId);
@@ -186,13 +186,13 @@ Supported events:
 
 ## x402 Agent Payments
 
-Use `@ponponpay/sdk/x402` only in server-side code. It requires your merchant API Key and must never be bundled into browser code.
+Use `@polypay/sdk/x402` only in server-side code. It requires your merchant API Key and must never be bundled into browser code.
 
 ```ts
-import { ponponpayX402 } from '@ponponpay/sdk/x402';
+import { polypayX402 } from '@polypay/sdk/x402';
 
-const x402 = ponponpayX402({
-  apiKey: process.env.PONPONPAY_API_KEY!,
+const x402 = polypayX402({
+  apiKey: process.env.POLYPAY_API_KEY!,
   resource: {
     resource: 'https://merchant.example.com/api/premium-data',
     method: 'GET',
@@ -247,23 +247,23 @@ Only standard EVM `exact` payments with Circle USDC `transferWithAuthorization` 
 After build, use:
 
 ```html
-<script src="/path/to/ponponpay.min.global.js"></script>
+<script src="/path/to/polypay.min.global.js"></script>
 <script>
-  const client = new PonponPay.PonponPayClient({
+  const client = new PolyPay.PolyPayClient({
     publicKey: 'pub_your_public_key',
-    baseUrl: 'https://api.ponponpay.com'
+    baseUrl: 'https://api.polypay.ai'
   });
 </script>
 ```
 
 The global bundle also exposes:
 
-- `window.PonponPay`
-- `window.PonponPayClient`
-- `window.PonponPayCheckout`
-- `window.PonponPayX402`
+- `window.PolyPay`
+- `window.PolyPayClient`
+- `window.PolyPayCheckout`
+- `window.PolyPayX402`
 
-Do not use `PonponPayX402` from a public script tag in production because x402 settlement requires your merchant API Key.
+Do not use `PolyPayX402` from a public script tag in production because x402 settlement requires your merchant API Key.
 
 ## Build
 

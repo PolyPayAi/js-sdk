@@ -1,4 +1,4 @@
-import { PonponPayError } from './errors';
+import { PolyPayError } from './errors';
 import {
   X402GuardOptions,
   X402GuardResult,
@@ -15,7 +15,7 @@ const USDC_CONTRACTS: Record<string, string> = {
   'eip155:137': '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359'
 };
 
-export class PonponPayX402 {
+export class PolyPayX402 {
   private readonly apiKey: string;
   private readonly facilitatorUrl: string;
   private readonly timeout: number;
@@ -24,17 +24,17 @@ export class PonponPayX402 {
 
   constructor(options: X402GuardOptions) {
     if (!options.apiKey?.trim()) {
-      throw new PonponPayError('apiKey is required for x402.');
+      throw new PolyPayError('apiKey is required for x402.');
     }
     if (!options.resource?.resource) {
-      throw new PonponPayError('resource.resource is required for x402.');
+      throw new PolyPayError('resource.resource is required for x402.');
     }
     if (!options.resource?.payTo) {
-      throw new PonponPayError('resource.payTo is required for x402.');
+      throw new PolyPayError('resource.payTo is required for x402.');
     }
 
     this.apiKey = options.apiKey.trim();
-    this.facilitatorUrl = normalizeX402Url(options.facilitatorUrl ?? 'https://api.ponponpay.com');
+    this.facilitatorUrl = normalizeX402Url(options.facilitatorUrl ?? 'https://api.polypay.ai');
     this.timeout = options.timeout ?? 30000;
     this.fetchImpl = options.fetch ?? fetch;
     const { scheme, network, asset, assetContract, maxTimeoutSeconds, ...resource } = options.resource;
@@ -133,7 +133,7 @@ export class PonponPayX402 {
       return parseApiResponse<T>(response);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
-        throw new PonponPayError('PonponPay x402 request timed out.');
+        throw new PolyPayError('PolyPay x402 request timed out.');
       }
       throw error;
     } finally {
@@ -146,6 +146,6 @@ export class PonponPayX402 {
   }
 }
 
-export function ponponpayX402(options: X402GuardOptions): PonponPayX402 {
-  return new PonponPayX402(options);
+export function polypayX402(options: X402GuardOptions): PolyPayX402 {
+  return new PolyPayX402(options);
 }
