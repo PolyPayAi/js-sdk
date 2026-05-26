@@ -75,6 +75,16 @@ https://api.polypay.ai/api/v1/sdk
 
 If you already pass a URL ending in `/api/v1` or `/api/v1/sdk`, it will preserve the correct path.
 
+## Sandbox Testing
+
+Browser Public Key Mode is intended for production checkout flows. For sandbox testing, use the merchant dashboard:
+
+1. Create a sandbox API key from Dashboard -> API Keys.
+2. Configure a sandbox webhook from Dashboard -> Webhooks.
+3. Create and simulate sandbox orders from Dashboard -> Orders.
+
+Server-side integrations that use API Key Mode should pass the sandbox key that starts with `sk_sandbox_`. The API host stays the same; PolyPay isolates production and sandbox data by the API key environment.
+
 ## API
 
 ### `new PolyPayClient(options)`
