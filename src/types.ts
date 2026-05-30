@@ -24,6 +24,24 @@ export interface CreateOrderParams {
   notifyUrl?: string;
 }
 
+export interface HostedCheckoutParams {
+  publicKey: string;
+  amount: number | string;
+  timestamp: number | string;
+  signature: string;
+  orderId?: string;
+  redirectUrl?: string;
+  notifyUrl?: string;
+  contract?: string;
+  currency?: Currency;
+  network?: Network;
+}
+
+export interface HostedCheckoutOptions {
+  checkoutUrl?: string;
+  locale?: string;
+}
+
 export interface SessionTokenPayload {
   token: string;
   expiresAt: number;

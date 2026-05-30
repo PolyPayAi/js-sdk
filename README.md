@@ -2,12 +2,11 @@
 
 Official SDK for PolyPay browser checkout integrations and server-side x402 agent payments.
 
-The browser client is designed for frontend applications that need to:
+The browser checkout helper is designed for frontend applications that need to:
 
-- exchange a merchant `public_key` for a short-lived session token
-- create orders directly from the browser
-- query order status from the browser
-- redirect users to the payment page or open it in a popup
+- redirect users to PolyPay hosted checkout
+- let PolyPay handle payment method selection
+- optionally pass `currency` and `network` to skip method selection and go straight to the payment page
 
 The x402 helper is designed for server-side route handlers that need to:
 
@@ -17,6 +16,7 @@ The x402 helper is designed for server-side route handlers that need to:
 
 ## Features
 
+- Hosted checkout redirect, no merchant-side payment method page required
 - Public Key Mode for browser checkout, no API key exposure in the browser
 - automatic short-lived token issuance and refresh
 - browser-first `fetch` implementation with no runtime dependencies
@@ -37,23 +37,35 @@ pnpm add @polypay/sdk
 ## Quick Start
 
 ```ts
-import { PolyPayClient } from '@polypay/sdk/browser';
+import { PolyPayCheckout } from '@polypay/sdk/browser';
 
-const client = new PolyPayClient({
+const checkout = new PolyPayCheckout();
+
+checkout.redirectToHostedCheckout({
   publicKey: 'pub_your_public_key',
-  baseUrl: 'https://api.polypay.ai'
-});
-
-const order = await client.createOrder({
-  currency: 'USDT',
-  network: 'tron',
   amount: 100,
+  timestamp: Date.now(),
+  signature: 'server_generated_signature',
   orderId: 'ORDER_123456',
   notifyUrl: 'https://your-site.com/webhook',
   redirectUrl: 'https://your-site.com/success'
 });
+```
 
-window.location.href = order.paymentUrl;
+Pass `currency` and `network` only when the merchant already knows the payment method:
+
+```ts
+checkout.redirectToHostedCheckout({
+  publicKey: 'pub_your_public_key',
+  amount: 100,
+  timestamp: Date.now(),
+  signature: 'server_generated_signature',
+  orderId: 'ORDER_123456',
+  notifyUrl: 'https://your-site.com/webhook',
+  redirectUrl: 'https://your-site.com/success',
+  currency: 'USDT',
+  network: 'Tron'
+});
 ```
 
 ## API Base URL
@@ -109,7 +121,7 @@ console.log(token.token, token.expiresAt);
 
 ### `client.createOrder(params)`
 
-Create an order with the session token obtained from Public Key Mode.
+Create an order with the session token obtained from Public Key Mode. For normal merchant checkout, prefer hosted checkout so PolyPay owns payment method selection.
 
 ```ts
 const order = await client.createOrder({
@@ -137,6 +149,31 @@ Response fields:
 const status = await client.getOrderStatus(order.tradeId);
 console.log(status.status);
 ```
+
+### `checkout.buildHostedCheckoutUrl(params, options?)`
+
+Build the hosted checkout URL without navigating.
+
+```ts
+const url = checkout.buildHostedCheckoutUrl({
+  publicKey: 'pub_your_public_key',
+  amount: 50,
+  timestamp: Date.now(),
+  signature: 'server_generated_signature',
+  orderId: 'ORDER_001',
+  redirectUrl: 'https://your-site.com/success',
+  notifyUrl: 'https://your-site.com/webhook'
+});
+```
+
+### `checkout.redirectToHostedCheckout(params, options?)`
+
+Redirect the current browser window to PolyPay hosted checkout.
+
+Options:
+
+- `checkoutUrl?: string` Hosted checkout origin, default `https://checkout.polypay.ai`
+- `locale?: string` Locale path segment, default `en`
 
 Response fields:
 

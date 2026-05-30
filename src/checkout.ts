@@ -1,6 +1,13 @@
 import { PolyPayError } from './errors';
-import { CheckoutStatusEventMap, ModalOptions, OrderStatusResponse, PollStatusOptions } from './types';
-import { assertBrowser, sleep } from './utils';
+import {
+  CheckoutStatusEventMap,
+  HostedCheckoutOptions,
+  HostedCheckoutParams,
+  ModalOptions,
+  OrderStatusResponse,
+  PollStatusOptions
+} from './types';
+import { assertBrowser, sleep, trimTrailingSlash } from './utils';
 import { PolyPayClient } from './client';
 
 type EventName = keyof CheckoutStatusEventMap;
@@ -14,6 +21,50 @@ export class PolyPayCheckout {
 
   constructor(client?: PolyPayClient) {
     this.client = client;
+  }
+
+  buildHostedCheckoutUrl(params: HostedCheckoutParams, options: HostedCheckoutOptions = {}): string {
+    if (!params.publicKey?.trim()) {
+      throw new PolyPayError('publicKey is required.');
+    }
+    if (params.amount === undefined || params.amount === null || params.amount === '') {
+      throw new PolyPayError('amount is required.');
+    }
+    if (params.timestamp === undefined || params.timestamp === null || params.timestamp === '') {
+      throw new PolyPayError('timestamp is required.');
+    }
+    if (!params.signature?.trim()) {
+      throw new PolyPayError('signature is required.');
+    }
+
+    const checkoutUrl = trimTrailingSlash(options.checkoutUrl ?? 'https://checkout.polypay.ai');
+    const locale = options.locale?.trim() || 'en';
+    const url = new URL(`${checkoutUrl}/${encodeURIComponent(locale)}/checkout`);
+    const query: Record<string, string | undefined> = {
+      public_key: params.publicKey.trim(),
+      amount: String(params.amount),
+      timestamp: String(params.timestamp),
+      signature: params.signature.trim(),
+      order_id: params.orderId,
+      redirect_url: params.redirectUrl,
+      notify_url: params.notifyUrl,
+      contract: params.contract,
+      currency: params.currency,
+      network: params.network
+    };
+
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== '') {
+        url.searchParams.set(key, value);
+      }
+    }
+
+    return url.toString();
+  }
+
+  redirectToHostedCheckout(params: HostedCheckoutParams, options: HostedCheckoutOptions = {}): void {
+    assertBrowser();
+    window.location.href = this.buildHostedCheckoutUrl(params, options);
   }
 
   redirect(paymentUrl: string): void {
