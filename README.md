@@ -52,6 +52,19 @@ checkout.redirectToHostedCheckout({
 });
 ```
 
+By default this redirects to:
+
+```text
+https://checkout.polypay.ai/en/checkout
+```
+
+Use `locale` to choose a localized checkout page, for example:
+
+```ts
+checkout.redirectToHostedCheckout(params, { locale: 'zh' });
+// https://checkout.polypay.ai/zh/checkout
+```
+
 Pass `currency` and `network` only when the merchant already knows the payment method:
 
 ```ts
@@ -164,6 +177,12 @@ const url = checkout.buildHostedCheckoutUrl({
   redirectUrl: 'https://your-site.com/success',
   notifyUrl: 'https://your-site.com/webhook'
 });
+```
+
+The generated URL format is:
+
+```text
+https://checkout.polypay.ai/{locale}/checkout?public_key=...&amount=...&signature=...
 ```
 
 ### `checkout.redirectToHostedCheckout(params, options?)`
