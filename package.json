@@ -6,7 +6,7 @@
   "homepage": "https://polypay.ai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/usepolypay/js-sdk.git"
+    "url": "git+https://github.com/PolyPayAi/js-sdk.git"
   },
   "keywords": [
     "polypay",
