@@ -60,6 +60,9 @@ export interface OrderStatusResponse {
   tradeId: string;
   status: OrderStatus;
   amount: number;
+  confirmations?: number;
+  requiredConfirmations?: number;
+  txHash?: string;
   paidAt?: number;
 }
 
