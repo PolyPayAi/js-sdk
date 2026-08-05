@@ -11,7 +11,8 @@ The browser checkout helper is designed for frontend applications that need to:
 The x402 helper is designed for server-side route handlers that need to:
 
 - return HTTP 402 payment requirements for protected resources
-- verify `X-PAYMENT` payloads
+- advertise `PAYMENT-REQUIRED` and verify `PAYMENT-SIGNATURE` payloads
+- return `PAYMENT-RESPONSE` settlement receipts
 - settle standard EVM USDC `exact` payments through PolyPay
 
 ## Features
@@ -260,7 +261,7 @@ const x402 = polypayX402({
     resource: 'https://merchant.example.com/api/premium-data',
     method: 'GET',
     price: '$0.01',
-    maxAmountRequired: '10000',
+    amount: '10000',
     network: 'eip155:8453',
     asset: 'USDC',
     payTo: '0xYourMerchantSettlementWallet',
@@ -274,9 +275,19 @@ export async function GET(request: Request) {
     return result.required();
   }
 
-  return Response.json({ data: 'premium payload' });
+  return Response.json(
+    { data: 'premium payload' },
+    { headers: result.responseHeaders }
+  );
 }
 ```
+
+The helper emits x402 v2 by default. Set `protocolVersion: 1` only during a controlled migration for legacy clients.
+The configured `resource` URL and `method` are the canonical public request identity used for verification, including behind reverse proxies. A v2 helper reads only `PAYMENT-SIGNATURE`; a v1 helper reads only `X-PAYMENT`.
+
+Keep the matching Dashboard Resource enabled. Settlement rejects disabled or missing resources. Raw standard facilitator requests that omit method/resource context are accepted only when the enabled Resource resolves uniquely from merchant, network, asset, amount, and recipient.
+
+`paid` reports settlement state. `shouldFulfill` is true only for the request that wins the first confirmed payment-state transition; concurrent or later successful requests receive false. `fulfillmentKey` is the stable PolyPay payment ID. This flag is not a replacement for business idempotency: stateful endpoints must atomically persist their first business response under the unique key and return that stored response on retries. Read-only endpoints may continue serving the same protected representation when `paid` is true.
 
 ### x402 Resource Options
 
@@ -285,7 +296,8 @@ export async function GET(request: Request) {
 | `resource` | Yes | Canonical protected resource URL |
 | `payTo` | Yes | Merchant EVM wallet address receiving USDC |
 | `price` | Yes* | Human-readable price, for example `$0.01` |
-| `maxAmountRequired` | Yes* | USDC base-unit amount; required if `price` is omitted |
+| `amount` | Yes* | x402 v2 USDC base-unit amount; required if `price` is omitted |
+| `maxAmountRequired` | No | Legacy v1 alias for `amount` during migration |
 | `method` | No | Protected HTTP method |
 | `description` | No | Description shown to agents |
 | `mimeType` | No | Resource MIME type |
@@ -294,6 +306,7 @@ export async function GET(request: Request) {
 | `asset` | No | Defaults to `USDC` |
 | `assetContract` | No | Defaults to the network-specific Circle USDC contract |
 | `maxTimeoutSeconds` | No | Defaults to `60` |
+| `protocolVersion` | No | Defaults to `2`; set to `1` only for an explicit legacy migration |
 
 Supported standard x402 networks:
 
@@ -304,6 +317,8 @@ Supported standard x402 networks:
 | `eip155:137` | Polygon | `0x3c499c542cef5e3811e1192ce70d8cc03d5c3359` |
 
 Only standard EVM `exact` payments with Circle USDC `transferWithAuthorization` are supported. BSC, Tron, Solana, TON, and BTC are not part of this standard exact flow.
+
+The helper validates the scheme, network, matching Circle USDC contract, and EIP-3009 metadata when it is created. Unsupported overrides fail before a payment challenge is sent to a wallet. If a settle request times out, retry the same signed payment proof; do not create a replacement authorization solely because the result is indeterminate.
 
 ## Script Tag Build
 
