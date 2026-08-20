@@ -13,6 +13,36 @@ import { PolyPayClient } from './client';
 type EventName = keyof CheckoutStatusEventMap;
 type EventHandler<T extends EventName> = (payload: CheckoutStatusEventMap[T]) => void;
 
+const SUPPORTED_CHECKOUT_LOCALES = new Set([
+  'zh',
+  'en',
+  'ja',
+  'ko',
+  'es',
+  'fr',
+  'de',
+  'pt',
+  'ru',
+  'ar'
+]);
+
+function normalizeCheckoutLocale(locale?: string): string {
+  const value = locale?.trim().toLowerCase();
+  if (!value) {
+    return '';
+  }
+  const baseLocale = value.replace(/_/g, '-').split('-')[0];
+  return SUPPORTED_CHECKOUT_LOCALES.has(baseLocale) ? baseLocale : 'en';
+}
+
+function buildCheckoutPath(checkoutUrl: string, locale?: string): string {
+  const normalizedLocale = normalizeCheckoutLocale(locale);
+  if (!normalizedLocale) {
+    return `${checkoutUrl}/checkout`;
+  }
+  return `${checkoutUrl}/${encodeURIComponent(normalizedLocale)}/checkout`;
+}
+
 export class PolyPayCheckout {
   private readonly client?: PolyPayClient;
   private popupWindow: Window | null = null;
@@ -38,8 +68,7 @@ export class PolyPayCheckout {
     }
 
     const checkoutUrl = trimTrailingSlash(options.checkoutUrl ?? 'https://checkout.polypay.ai');
-    const locale = options.locale?.trim() || 'en';
-    const url = new URL(`${checkoutUrl}/${encodeURIComponent(locale)}/checkout`);
+    const url = new URL(buildCheckoutPath(checkoutUrl, options.locale));
     const query: Record<string, string | undefined> = {
       public_key: params.publicKey.trim(),
       amount: String(params.amount),

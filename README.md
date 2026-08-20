@@ -53,10 +53,10 @@ checkout.redirectToHostedCheckout({
 });
 ```
 
-By default this redirects to:
+By default this redirects to the locale-neutral checkout URL so PolyPay can detect the customer's browser language. If the language cannot be detected or is unsupported, checkout falls back to English:
 
 ```text
-https://checkout.polypay.ai/en/checkout
+https://checkout.polypay.ai/checkout
 ```
 
 Use `locale` to choose a localized checkout page, for example:
@@ -174,7 +174,13 @@ const url = checkout.buildHostedCheckoutUrl({
 });
 ```
 
-The generated URL format is:
+The generated URL format is locale-neutral by default:
+
+```text
+https://checkout.polypay.ai/checkout?public_key=...&amount=...&signature=...
+```
+
+When `locale` is provided, the SDK pins the language path:
 
 ```text
 https://checkout.polypay.ai/{locale}/checkout?public_key=...&amount=...&signature=...
@@ -187,7 +193,7 @@ Redirect the current browser window to PolyPay hosted checkout.
 Options:
 
 - `checkoutUrl?: string` Hosted checkout origin, default `https://checkout.polypay.ai`
-- `locale?: string` Locale path segment, default `en`
+- `locale?: string` Optional locale path segment. When omitted, checkout detects the customer's browser language and falls back to English if unsupported.
 
 Response fields:
 
