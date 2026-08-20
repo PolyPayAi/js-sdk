@@ -95,7 +95,7 @@ export interface CheckoutStatusEventMap {
 
 export interface X402PaymentRequirements {
   scheme: 'exact';
-  network: 'eip155:8453' | 'eip155:1' | 'eip155:137';
+  network: 'eip155:8453' | 'eip155:1' | 'eip155:137' | 'eip155:42161' | 'eip155:10';
   amount?: string;
   price?: string;
   maxAmountRequired?: string;

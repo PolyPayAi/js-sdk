@@ -238,6 +238,26 @@ test('x402 rejects unsupported settlement configuration before emitting a challe
   );
 });
 
+test('x402 supports every production network with its Circle USDC contract', () => {
+  const networks = {
+    'eip155:8453': '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    'eip155:1': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    'eip155:137': '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+    'eip155:42161': '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    'eip155:10': '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85'
+  };
+
+  for (const [network, asset] of Object.entries(networks)) {
+    const helper = polypayX402({
+      apiKey: 'test-key',
+      resource: { ...resource, network }
+    });
+    const required = decodeHeader(helper.requirementResponse().headers.get('PAYMENT-REQUIRED'));
+    assert.equal(required.accepts[0].network, network);
+    assert.equal(required.accepts[0].asset, asset);
+  }
+});
+
 function encodeHeader(value) {
   return Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
 }
