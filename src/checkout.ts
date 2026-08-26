@@ -7,11 +7,41 @@ import {
   OrderStatusResponse,
   PollStatusOptions
 } from './types';
-import { assertBrowser, sleep } from './utils';
+import { assertBrowser, sleep, trimTrailingSlash } from './utils';
 import { PolyPayClient } from './client';
 
 type EventName = keyof CheckoutStatusEventMap;
 type EventHandler<T extends EventName> = (payload: CheckoutStatusEventMap[T]) => void;
+
+const SUPPORTED_CHECKOUT_LOCALES = new Set([
+  'zh',
+  'en',
+  'ja',
+  'ko',
+  'es',
+  'fr',
+  'de',
+  'pt',
+  'ru',
+  'ar'
+]);
+
+function normalizeCheckoutLocale(locale?: string): string {
+  const value = locale?.trim().toLowerCase();
+  if (!value) {
+    return '';
+  }
+  const baseLocale = value.replace(/_/g, '-').split('-')[0];
+  return SUPPORTED_CHECKOUT_LOCALES.has(baseLocale) ? baseLocale : 'en';
+}
+
+function buildCheckoutPath(checkoutUrl: string, locale?: string): string {
+  const normalizedLocale = normalizeCheckoutLocale(locale);
+  if (!normalizedLocale) {
+    return `${checkoutUrl}/checkout`;
+  }
+  return `${checkoutUrl}/${encodeURIComponent(normalizedLocale)}/checkout`;
+}
 
 export class PolyPayCheckout {
   private readonly client?: PolyPayClient;
@@ -24,11 +54,41 @@ export class PolyPayCheckout {
   }
 
   buildHostedCheckoutUrl(params: HostedCheckoutParams, options: HostedCheckoutOptions = {}): string {
-    void params;
-    void options;
-    throw new PolyPayError(
-      'Public Key checkout URL generation is disabled. Create Hosted Checkout on your merchant server and use the returned checkout_url.'
-    );
+    if (!params.publicKey?.trim()) {
+      throw new PolyPayError('publicKey is required.');
+    }
+    if (params.amount === undefined || params.amount === null || params.amount === '') {
+      throw new PolyPayError('amount is required.');
+    }
+    if (params.timestamp === undefined || params.timestamp === null || params.timestamp === '') {
+      throw new PolyPayError('timestamp is required.');
+    }
+    if (!params.signature?.trim()) {
+      throw new PolyPayError('signature is required.');
+    }
+
+    const checkoutUrl = trimTrailingSlash(options.checkoutUrl ?? 'https://checkout.polypay.ai');
+    const url = new URL(buildCheckoutPath(checkoutUrl, options.locale));
+    const query: Record<string, string | undefined> = {
+      public_key: params.publicKey.trim(),
+      amount: String(params.amount),
+      timestamp: String(params.timestamp),
+      signature: params.signature.trim(),
+      order_id: params.orderId,
+      redirect_url: params.redirectUrl,
+      notify_url: params.notifyUrl,
+      contract: params.contract,
+      currency: params.currency,
+      network: params.network
+    };
+
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== '') {
+        url.searchParams.set(key, value);
+      }
+    }
+
+    return url.toString();
   }
 
   redirectToHostedCheckout(params: HostedCheckoutParams, options: HostedCheckoutOptions = {}): void {
