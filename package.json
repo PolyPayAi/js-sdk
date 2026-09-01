@@ -1,7 +1,7 @@
 {
   "name": "@polypay/sdk",
-  "version": "1.3.0",
-  "description": "Official PolyPay JavaScript SDK for browser integrations using Public Key mode.",
+  "version": "2.0.0",
+  "description": "Official PolyPay SDK for secure Hosted Checkout redirects and server-side x402 payments.",
   "license": "MIT",
   "homepage": "https://polypay.ai",
   "repository": {
@@ -12,7 +12,7 @@
     "polypay",
     "crypto",
     "payment",
-    "public-key",
+    "hosted-checkout",
     "browser-sdk",
     "usdt",
     "usdc"
@@ -46,7 +46,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "pnpm build && node --test tests/x402.test.mjs",
+    "test": "pnpm build && node --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

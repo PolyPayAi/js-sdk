@@ -5,17 +5,6 @@ export function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '');
 }
 
-export function normalizeBaseUrl(baseUrl: string): string {
-  const trimmed = trimTrailingSlash(baseUrl);
-  if (trimmed.endsWith('/api/v1/sdk')) {
-    return trimmed;
-  }
-  if (trimmed.endsWith('/api/v1')) {
-    return `${trimmed}/sdk`;
-  }
-  return `${trimmed}/api/v1/sdk`;
-}
-
 export function normalizeX402Url(baseUrl: string): string {
   const trimmed = trimTrailingSlash(baseUrl);
   if (trimmed.endsWith('/api/v1/pay/x402')) {
@@ -31,12 +20,6 @@ export function normalizeX402Url(baseUrl: string): string {
     return `${trimmed}/pay/x402`;
   }
   return `${trimmed}/api/v1/pay/x402`;
-}
-
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
 }
 
 export function assertBrowser(): void {

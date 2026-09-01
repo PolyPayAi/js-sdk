@@ -1,71 +1,3 @@
-export type Currency = 'USDT' | 'USDC' | 'BUSD' | (string & {});
-
-export type Network = 'tron' | 'ethereum' | 'bsc' | 'solana' | 'polygon' | (string & {});
-
-export type OrderStatus = 'pending' | 'paid' | 'expired' | 'cancelled' | 'unknown';
-
-export interface PolyPayClientOptions {
-  publicKey: string;
-  baseUrl?: string;
-  tokenPath?: string;
-  ordersPath?: string;
-  timeout?: number;
-  autoRefreshWindowSeconds?: number;
-  headers?: Record<string, string>;
-  fetch?: typeof fetch;
-}
-
-export interface CreateOrderParams {
-  currency: Currency;
-  network: Network;
-  amount: number;
-  orderId?: string;
-  redirectUrl?: string;
-  notifyUrl?: string;
-}
-
-export interface HostedCheckoutParams {
-  publicKey: string;
-  amount: number | string;
-  timestamp: number | string;
-  signature: string;
-  orderId?: string;
-  redirectUrl?: string;
-  notifyUrl?: string;
-  contract?: string;
-  currency?: Currency;
-  network?: Network;
-}
-
-export interface HostedCheckoutOptions {
-  checkoutUrl?: string;
-  locale?: string;
-}
-
-export interface SessionTokenPayload {
-  token: string;
-  expiresAt: number;
-}
-
-export interface CreateOrderResponse {
-  tradeId: string;
-  paymentUrl: string;
-  amount: number;
-  actualAmount: number;
-  address: string;
-  expiresAt: number;
-}
-
-export interface OrderStatusResponse {
-  tradeId: string;
-  status: OrderStatus;
-  amount: number;
-  confirmations?: number;
-  requiredConfirmations?: number;
-  txHash?: string;
-  paidAt?: number;
-}
-
 export interface ApiEnvelope<T> {
   code: number;
   message: string;
@@ -76,21 +8,6 @@ export interface ModalOptions {
   width?: string;
   height?: string;
   onClose?: () => void;
-}
-
-export interface PollStatusOptions {
-  interval?: number;
-  timeout?: number;
-  signal?: AbortSignal;
-}
-
-export interface CheckoutStatusEventMap {
-  pending: OrderStatusResponse;
-  paid: OrderStatusResponse;
-  expired: OrderStatusResponse;
-  cancelled: OrderStatusResponse;
-  unknown: OrderStatusResponse;
-  error: Error;
 }
 
 export interface X402PaymentRequirements {
